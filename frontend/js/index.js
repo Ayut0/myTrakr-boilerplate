@@ -20,14 +20,24 @@ $(() => {
   })
 
   //Create New Account
-  const userA = new Account('Yuto')
-  console.log(userA);
-
   $.ajax({
-    url: 'http://localhost:3000/accounts',
-    type: 'post',
+    url: "http://localhost:3000/accounts",
+    type: "post",
+    contentType: "application/json",
     dataType: 'json',
-  }).done((data) =>{
-    console.log(`Posted by Ajax ${data}`)
+    data: JSON.stringify({
+      newAccount: {
+        username: "yuto",
+        transactions: [],
+      },
+    }),
   })
+    .done((data) => {
+      console.log(data);
+      // let user = new Account(JSON.stringify(data.id));
+      // alert(`Created by Ajax ${user}`);
+    })
+    .fail((error) => {
+      console.log(error);
+    });
 });
