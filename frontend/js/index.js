@@ -18,4 +18,16 @@ $(() => {
 
     console.log(name);
   })
+
+  //Create New Account
+  const userA = new Account('Yuto')
+  console.log(userA);
+
+  $.ajax({
+    url: 'http://localhost:3000/accounts',
+    type: 'post',
+    dataType: 'json',
+  }).done((data) =>{
+    console.log(`Posted by Ajax ${data}`)
+  })
 });
