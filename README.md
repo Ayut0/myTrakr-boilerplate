@@ -57,7 +57,6 @@ frontend
   - New Account section
   - Account Summary
   - Transactions list
-  
 
 ## API Endpoints
 
