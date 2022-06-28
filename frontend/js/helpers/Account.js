@@ -1,7 +1,7 @@
 class Account {
   constructor(username) {
     this.username = username;
-    this.transactions = [];
+    this.transactions = [1];
   }
   
 
