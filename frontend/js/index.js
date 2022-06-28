@@ -6,6 +6,7 @@ $(() => {
     console.log("Submitted");
   });
 
+  let userList = [];
   //create user account summary list via data stored in server
   $.ajax({
     url: "http://localhost:3000/accounts",
@@ -13,10 +14,9 @@ $(() => {
     contentType: "application/json",
     dataType: "json",
   }).done((data) => {
-    console.log(data);
     let account_summary = $.map(data, (user) => {
       return `
-              <li>Account Name:${user.username}: Total Balance:${user.transactions}</li>
+              <li>Account Name: ${user.username}: Total Balance: ${user.transactions}</li>
             `;
     });
     $("#summary_list").append(account_summary);
@@ -25,9 +25,11 @@ $(() => {
   //Get the value from account input
   $("#create_account_button").click((e) => {
     e.preventDefault();
+    // console.log(userList);
+
     if (
       $("#account_input").val() === "" ||
-      $.inArray($("#account_input").val(), name) !== -1
+      $.inArray($("#account_input").val(), userList) !== -1
     ) {
       alert("Pls enter valid user name");
     } else {
@@ -45,7 +47,8 @@ $(() => {
         }),
       })
         .done((data) => {
-          console.log(data);
+          console.log(data.username);
+          userList.push(data.username);
           //create user account summary
           $("#summary_list")
           .append(`
@@ -53,10 +56,12 @@ $(() => {
               `);
         //Reset input
         $("#account_input").val('');
+        return userList;
         })
         .fail((error) => {
           console.log(error);
         });
     }
   });
+  // console.log(userList);
 });
