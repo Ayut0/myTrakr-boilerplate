@@ -63,5 +63,10 @@ $(() => {
         });
     }
   });
-  // console.log(userList);
+  
+  //Get value of ratio buttons
+  $("input:radio[name='r1']").change(() =>{
+    let checkedRadio = $("input:radio[name='r1']:checked").val();
+    console.log(checkedRadio);
+  })
 });
