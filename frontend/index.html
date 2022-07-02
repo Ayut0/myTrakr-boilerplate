@@ -27,20 +27,27 @@
         <button id="create_account_button">Add new account</button>
       </form>
       <form action="">
-        New Transaction: Deposit
-        <input type="radio" name="r1" id="transactionRatio1" value="Withdraw"/>
+        New Transaction:
+        Deposit
+        <input type="radio" name="r1" id="transactionRatio1" value="Deposit"/>
         Withdraw
-        <input type="radio" name="r1" id="transactionRatio2" value="Transfer"/>
+        <input type="radio" name="r1" id="transactionRatio2" value="Withdraw"/>
         Transfer
-        <input type="radio" name="r1" id="transactionRatio3" value="Account"/>
-        Account:
-        <select></select>
+        <input type="radio" name="r1" id="transactionRatio3" value="Transfer"/>
 
-        From:
-        <select></select>
+        <div class="accountButton" id="accountButton">
+          Account:
+          <select></select>
+        </div>
+        <div class="fromButton" id="fromButton">
+          From:
+          <select></select>
+        </div>
+        <div class="toButton" id="toButton">
+          To:
+          <select></select>
+        </div>
 
-        To:
-        <select></select>
         Category:
         <select></select>
         <input type="text" />
