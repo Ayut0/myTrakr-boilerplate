@@ -63,10 +63,22 @@ $(() => {
         });
     }
   });
-  
+  const fromSelect = $("#fromButton");
+  const toSelect = $("#toButton");
+  const accountSelect = $("#accountButton")
+
   //Get value of ratio buttons
   $("input:radio[name='r1']").change(() =>{
     let checkedRadio = $("input:radio[name='r1']:checked").val();
     console.log(checkedRadio);
+    if(checkedRadio === "Deposit" || checkedRadio === "Withdraw"){
+      fromSelect.hide();
+      toSelect.hide();
+    }else{
+      fromSelect.show();
+      toSelect.show();
+    }
+
+    checkedRadio === "Transfer" ? accountSelect.hide(): accountSelect.show();
   })
 });
