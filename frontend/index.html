@@ -48,10 +48,15 @@
           <select></select>
         </div>
 
-        Category:
-        <select></select>
-        <input type="text" />
-        <button type="button">Add new category</button>
+        <div class="category">
+          <label for="category">Category:</label>
+          <select name="category" id="categorySelect">
+            <option value="">Choose a Category or Add new one</option>
+            <option value="addNewCategory">Add new category</option>
+          </select>
+          <input type="text" id="categoryInput"/>
+          <button type="button" id="categoryButton">Add new category</button>
+        </div>
 
         Description
         <input type="text" />
