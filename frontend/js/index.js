@@ -65,7 +65,8 @@ $(() => {
   });
   const fromSelect = $("#fromButton");
   const toSelect = $("#toButton");
-  const accountSelect = $("#accountButton")
+  const accountSelect = $("#accountButton"
+  )
 
   //Get value of ratio buttons
   $("input:radio[name='r1']").change(() =>{
@@ -80,5 +81,35 @@ $(() => {
     }
 
     checkedRadio === "Transfer" ? accountSelect.hide(): accountSelect.show();
+  })
+
+  //Add new category
+  const categoryInput = $("#categoryInput");
+  const categorySelect = $("#categorySelect");
+  const newCategoryButton = $("#categoryButton")
+  categoryInput.hide();
+  newCategoryButton.hide();
+
+  categorySelect.change((event) =>{
+    event.preventDefault();
+    // console.log($("[name = category]").val());
+    if($("[name = category]").val() === "addNewCategory"){
+      categoryInput.show();
+      newCategoryButton.show();
+    }else{
+      categoryInput.hide();
+      newCategoryButton.hide();
+    }
+  });
+
+  newCategoryButton.click((event) =>{
+    event.preventDefault()
+    //Form validation
+    if(categoryInput.val() === ''){
+      console.log('Empty');
+      return
+    }else{
+      console.log(categoryInput.val());
+    }
   })
 });
