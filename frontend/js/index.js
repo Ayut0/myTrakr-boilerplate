@@ -104,12 +104,27 @@ $(() => {
 
   newCategoryButton.click((event) =>{
     event.preventDefault()
-    //Form validation
-    if(categoryInput.val() === ''){
-      console.log('Empty');
-      return
-    }else{
-      console.log(categoryInput.val());
-    }
+    const categoryInputValue = categoryInput.val();
+    //Form validation and adding new category
+    (categoryInputValue.length > 0) &&
+      $.ajax({
+        url: "http://localhost:3000/categories",
+        type: "post",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify({
+          newCategory: {
+            categoryName: categoryInputValue,
+          },
+        }),
+      })
+      .done((data) =>{
+        const newCategoryOption = new Option(categoryInputValue);
+        $("#firstOption").remove();
+        categorySelect.prepend(newCategoryOption);
+        categoryInput.hide();
+        newCategoryButton.hide();
+        categoryInput.val('');
+      });
   })
 });
