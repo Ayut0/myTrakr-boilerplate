@@ -19,56 +19,63 @@
     <link rel="stylesheet" href="./css/index.css" />
   </head>
   <body>
-    myTrakr
+    <h1>myTrakr</h1>
     <main>
-      <form action="" id="accountForm">
-        New Account:
-        <input type="text" id="account_input" />
-        <button id="create_account_button" type="submit">Add new account</button>
-      </form>
-      <form action="">
-        New Transaction:
-        Deposit
-        <input type="radio" name="r1" id="transactionRatio1" value="Deposit"/>
-        Withdraw
-        <input type="radio" name="r1" id="transactionRatio2" value="Withdraw"/>
-        Transfer
-        <input type="radio" name="r1" id="transactionRatio3" value="Transfer"/>
+      <section class="account">
+        <h2>Add new account</h2>
+        <form action="" id="accountForm">
+          <h3>Account name:</h3>
+          <input type="text" id="account_input" />
+          <button id="create_account_button" type="submit">Add new account</button>
+        </form>
+      </section>
 
-        <div class="accountButton" id="accountButton">
-          Account:
-          <select id="accountSelect"></select>
-        </div>
-        <div class="fromButton" id="fromButton">
-          From:
-          <select id="fromSelect"></select>
-        </div>
-        <div class="toButton" id="toButton">
-          To:
-          <select id="toSelect"></select>
-        </div>
-
-        <div class="category">
-          <label for="category">Category:</label>
-          <select name="category" id="categorySelect">
-            <option value="" id="firstOption">Choose a Category or Add New...</option>
-            <option value="addNewCategory">Add new category</option>
-          </select>
-          <input type="text" id="categoryInput"/>
-          <button type="button" id="categoryButton">Add new category</button>
-        </div>
-
-        Description
-        <input type="text" />
-
-        Amount:
-        <input type="number" />
-
-        <button id="submit_bottun">Add transaction</button>
-      </form>
+      <section class="transaction">
+        <h2>New transaction</h2>
+        <form action="" id="transactionForm">
+          <h3>Transaction type:</h3>
+          <label for="deposit">Deposit</label>
+          <input type="radio" name="transactionType" id="deposit" value="Deposit"/>
+          <label for="withdraw">Withdraw</label>
+          <input type="radio" name="transactionType" id="withdraw" value="Withdraw"/>
+          <label for="transfer">Transfer</label>
+          <input type="radio" name="transactionType" id="transfer" value="Transfer"/>
+  
+          <div class="accountButton" id="accountButton">
+            Account:
+            <select id="accountSelect"></select>
+          </div>
+          <div class="fromButton" id="fromButton">
+            From:
+            <select id="fromSelect"></select>
+          </div>
+          <div class="toButton" id="toButton">
+            To:
+            <select id="toSelect"></select>
+          </div>
+  
+          <div class="category">
+            <label for="category">Category:</label>
+            <select name="category" id="categorySelect">
+              <option value="" id="firstOption">Choose a Category or Add New...</option>
+              <option value="addNewCategory">Add new category</option>
+            </select>
+            <input type="text" id="categoryInput"/>
+            <button type="button" id="categoryButton">Add new category</button>
+          </div>
+  
+          Description
+          <input type="text" />
+  
+          Amount:
+          <input type="number" />
+  
+          <button id="submit_bottun" type="submit">Add transaction</button>
+        </form>
+      </section>
 
       <section id="account_summary">
-        <h3>Account summary</h3>
+        <h2>Account summary</h2>
         <ul id="summary_list"></ul>
       </section>
       Filter by account:

@@ -81,8 +81,8 @@ $(() => {
   const accountSelect = $("#accountButton")
 
   //Get value of ratio buttons
-  $("input:radio[name='r1']").change(() =>{
-    let checkedRadio = $("input:radio[name='r1']:checked").val();
+  $("input:radio[name='transactionType']").change(() =>{
+    let checkedRadio = $("input:radio[name='transactionType']:checked").val();
     console.log(checkedRadio);
     if(checkedRadio === "Deposit" || checkedRadio === "Withdraw"){
       fromSelect.hide();
@@ -141,5 +141,9 @@ $(() => {
   })
 
   //Add new transaction
-
+  $("#transactionForm").submit((event) =>{
+    event.preventDefault();
+    alert("New transaction added");
+    
+  })
 });
