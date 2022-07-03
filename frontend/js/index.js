@@ -14,22 +14,37 @@ $(() => {
     contentType: "application/json",
     dataType: "json",
   }).done((data) => {
+    console.log(data);
     let account_summary = $.map(data, (user) => {
       return `
               <li>Account Name: ${user.username}: Total Balance: ${user.transactions}</li>
             `;
     });
     $("#summary_list").append(account_summary);
+    $.each(data, (index, value) =>{
+      createUserList(value.username, accountSelectList);
+      createUserList(value.username, fromList);
+      createUserList(value.username, toList);
+    })
   });
+
+  function createUserList(newUserName, selectTag){
+    return selectTag.append(`
+      <option value=${newUserName}>${newUserName}</option>
+      `);
+  }
+  const accountSelectList = $("#accountSelect");
+  const fromList = $("#fromSelect");
+  const toList = $("#toSelect");
+
 
   //Get the value from account input
   $("#create_account_button").click((e) => {
     e.preventDefault();
-    // console.log(userList);
-
+    const newAccountName = $("#account_input").val();
     if (
-      $("#account_input").val() === "" ||
-      $.inArray($("#account_input").val(), userList) !== -1
+      newAccountName === "" ||
+      $.inArray(newAccountName, userList) !== -1
     ) {
       alert("Pls enter valid user name");
     } else {
@@ -41,7 +56,7 @@ $(() => {
         dataType: "json",
         data: JSON.stringify({
           newAccount: {
-            username: `${$("#account_input").val()}`,
+            username: `${newAccountName}`,
             transactions: [],
           },
         }),
@@ -49,6 +64,10 @@ $(() => {
         .done((data) => {
           console.log(data.username);
           userList.push(data.username);
+          //Add a new user option tag
+          createUserList(data.username, accountSelectList);
+          createUserList(data.username, fromList);
+          createUserList(data.username, toList);
           //create user account summary
           $("#summary_list")
           .append(`
