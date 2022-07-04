@@ -21,7 +21,6 @@ $(() => {
         }),
       })
         .done((data) => {
-          // console.log(data.username);
           userList.push(data.username);
           //Add a new user option tag
           createUserList(data.username, accountSelectList);
@@ -143,7 +142,41 @@ $(() => {
   //Add new transaction
   $("#transactionForm").submit((event) =>{
     event.preventDefault();
-    alert("New transaction added");
-    
+    const transactionType = $("input[name='transactionType']:checked").val();
+    const transactionCategory = categorySelect.val();
+    const transactionAmount = Number($("#amount").val());
+    const transactionDescription = $("#description").val();
+    console.log(transactionType, transactionCategory, transactionAmount, transactionDescription);
+
+    $.ajax({
+      //Couldn't check the data
+      url: "http://localhost:3000/transaction",
+      type: "post",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify(
+        {
+        newTransaction: {
+          accountId: "1", // account ID for Deposits or Withdraws
+          accountIdFrom: "1", // sender ID if type = 'Transfer', otherwise null
+          accountIdTo: "1", // receiver ID if type = 'Transfer', otherwise null
+          // all info from form
+          type: `${transactionType}`,
+          category: `${transactionCategory}`,
+          description: `${transactionDescription}`,
+          transactionAmount: `${transactionAmount}`
+        },
+      }
+      ),
+    })
+      .done((data) => {
+        console.log(data);
+        $("#amount").val('');
+        $("#description").val('');
+        alert("New transaction added");
+      })
+      .fail((error) => {
+        alert(error);
+      });;
   })
 });
