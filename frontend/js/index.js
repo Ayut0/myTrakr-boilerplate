@@ -185,17 +185,20 @@ $(() => {
     const transactionCategory = categorySelect.val();
     const transactionAmount = Number($("#amount").val());
     const transactionDescription = $("#description").val();
-    let transactionUserName = $("[name=accountSelect] option:selected").text();
+    let transactionUserName;
     let userAccountId;
     let userAccountIdFrom;
     let userAccountIdTo;
 
     if(transactionType === "Deposit" || transactionType === "Withdraw"){
       userAccountId = $("#accountSelect").val();
+      transactionUserName = $("[name=accountSelect] option:selected").text();
     }
     if(transactionType === "Transfer"){
-      userAccountIdFrom = $("#fromSelect").val();
-      userAccountIdTo = $("#toSelect").val();
+      userAccountId = $("#fromSelect").val();
+      transactionUserName = $("[name=fromSelect] option:selected").text();
+      userAccountIdFrom = $("[name=fromSelect] option:selected").text();
+      userAccountIdTo = $("[name=toSelect] option:selected").text();
     }else{
       userAccountIdFrom = null;
       userAccountIdTo = null;
@@ -213,6 +216,8 @@ $(() => {
       transactionAmount: `${transactionAmount}`,
     };
 
+    console.log(newTransaction);
+
     $.ajax({
       url: "http://localhost:3000/transaction",
       type: "post",
@@ -223,10 +228,27 @@ $(() => {
       }),
     })
       .done((data) => {
+        console.log(data);
         $("#amount").val("");
         $("#description").val("");
         alert("New transaction added");
 
+        const td = $.map(data, (item) => {
+          return `
+            <tr>
+              <td>${item.id}</td>
+              <td>${item.userName}</td>
+              <td>${item.type}</td>
+              <td>${item.category}</td>
+              <td>${item.description}</td>
+              <td>${item.transactionAmount}</td>
+              <td>${item.accountIdFrom}</td>
+              <td>${item.accountIdTo}</td>
+            </tr>
+            `;
+        });
+        // console.log(td);
+        $("#transactionTable").append(td);
 
       })
       .fail((error) => {
@@ -235,9 +257,8 @@ $(() => {
   });
 
   //Add new transaction table
-
   function createTransactionTable (transactionData){
-    const tr = (`<tr></tr>`);
+    // const tr = (`<tr></tr>`);
     $.each(transactionData, (index, Array)=>{
       const td = $.map(Array, (item)=>{
         return (`
@@ -253,8 +274,7 @@ $(() => {
         </tr>
         `)
       })
-      console.log(td);
-
+      // console.log(td);
       $("#transactionTable").append(td);
     })
   }
