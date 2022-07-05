@@ -3,7 +3,6 @@ class Account {
     this.username = username;
     this.transactions = [];
   }
-  
 
   get balance() {
     return this.transactions.reduce((total, transaction) => {

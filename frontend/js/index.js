@@ -112,7 +112,6 @@ $(() => {
       contentType: "application/json",
       dataType: "json",
     }).done((data) => {
-      console.log(data);
       let categoryOption = $.map(data, (item) => {
         return `
                <option value=${item.name.categoryName}>${item.name.categoryName}</option>
@@ -125,7 +124,6 @@ $(() => {
 
   categorySelect.change((event) => {
     event.preventDefault();
-    // console.log($("[name = category]").val());
     if ($("[name = category]").val() === "addNewCategory") {
       categoryInput.show();
       newCategoryButton.show();
@@ -160,6 +158,21 @@ $(() => {
       });
   });
 
+  $.ajax({
+    url: "http://localhost:3000/accounts",
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+  }).done((data) => {
+    console.log(data);
+    const allUser = data.map(item =>{
+      const account = new Account(item.username, item.transactions);
+      return account;
+    })
+    // console.log(allUser);
+    // console.log(data.balance);
+  });
+
 
   //Add new transaction
   $("#transactionForm").submit((event) => {
@@ -172,21 +185,14 @@ $(() => {
     const transactionCategory = categorySelect.val();
     const transactionAmount = Number($("#amount").val());
     const transactionDescription = $("#description").val();
+    let transactionUserName = $("[name=accountSelect] option:selected").text();
     let userAccountId;
     let userAccountIdFrom;
     let userAccountIdTo;
-    // console.log(
-    //   transactionType,
-    //   transactionCategory,
-    //   transactionAmount,
-    //   transactionDescription
-    //   );
 
     if(transactionType === "Deposit" || transactionType === "Withdraw"){
       userAccountId = $("#accountSelect").val();
     }
-    // console.log(userAccountId, $("#accountSelect").val());
-
     if(transactionType === "Transfer"){
       userAccountIdFrom = $("#fromSelect").val();
       userAccountIdTo = $("#toSelect").val();
@@ -196,15 +202,16 @@ $(() => {
     }
 
     const newTransaction = {
-          accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
-          accountIdFrom: `${userAccountIdFrom}`, // sender ID if type = 'Transfer', otherwise null
-          accountIdTo: `${userAccountIdTo}`, // receiver ID if type = 'Transfer', otherwise null
-          // all info from form
-          type: `${transactionType}`,
-          category: `${transactionCategory}`,
-          description: `${transactionDescription}`,
-          transactionAmount: `${transactionAmount}`,
-        };
+      accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
+      accountIdFrom: `${userAccountIdFrom}`, // sender ID if type = 'Transfer', otherwise null
+      accountIdTo: `${userAccountIdTo}`, // receiver ID if type = 'Transfer', otherwise null
+      // all info from form{{
+      userName: `${transactionUserName}`,
+      type: `${transactionType}`,
+      category: `${transactionCategory}`,
+      description: `${transactionDescription}`,
+      transactionAmount: `${transactionAmount}`,
+    };
 
     $.ajax({
       url: "http://localhost:3000/transaction",
@@ -219,9 +226,50 @@ $(() => {
         $("#amount").val("");
         $("#description").val("");
         alert("New transaction added");
+
+
       })
       .fail((error) => {
         alert(error);
       });
   });
+
+  //Add new transaction table
+
+  function createTransactionTable (transactionData){
+    const tr = (`<tr></tr>`);
+    $.each(transactionData, (index, Array)=>{
+      const td = $.map(Array, (item)=>{
+        return (`
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.userName}</td>
+          <td>${item.type}</td>
+          <td>${item.category}</td>
+          <td>${item.description}</td>
+          <td>${item.transactionAmount}</td>
+          <td>${item.accountIdFrom}</td>
+          <td>${item.accountIdTo}</td>
+        </tr>
+        `)
+      })
+      console.log(td);
+
+      $("#transactionTable").append(td);
+    })
+  }
+
+  $.ajax({
+    url: "http://localhost:3000/transactions",
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+  })
+    .done((data) => {
+      console.log(data);
+      createTransactionTable(data);
+    })
+    .fail((error) => {
+      alert(error);
+    });
 });
