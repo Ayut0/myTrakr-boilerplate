@@ -183,7 +183,7 @@ $(() => {
     }
     const transactionType = $("input[name='transactionType']:checked").val();
     const transactionCategory = categorySelect.val();
-    const transactionAmount = Number($("#amount").val());
+    let transactionAmount;
     const transactionDescription = $("#description").val();
     let transactionUserName;
     let userAccountId;
@@ -193,12 +193,24 @@ $(() => {
     if(transactionType === "Deposit" || transactionType === "Withdraw"){
       userAccountId = $("#accountSelect").val();
       transactionUserName = $("[name=accountSelect] option:selected").text();
+
+      if(transactionType === "Deposit"){
+        transactionAmount = Number($("#amount").val());
+      }else{
+        transactionAmount = -Number($("#amount").val());
+      }
     }
     if(transactionType === "Transfer"){
       userAccountId = $("#fromSelect").val();
       transactionUserName = $("[name=fromSelect] option:selected").text();
       userAccountIdFrom = $("[name=fromSelect] option:selected").text();
       userAccountIdTo = $("[name=toSelect] option:selected").text();
+
+      if(transactionUserName === userAccountIdFrom){
+        transactionAmount = -Number($("#amount").val());
+      }else{
+        transactionAmount = Number($("#amount").val());
+      }
     }else{
       userAccountIdFrom = null;
       userAccountIdTo = null;
