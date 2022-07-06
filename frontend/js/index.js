@@ -46,6 +46,10 @@ $(() => {
 
   //create user account summary list via data stored in server
   let userList = [];
+
+  // function createAccountSummary(){
+
+  // }
   $(document).ready(() => {
     $.ajax({
       url: "http://localhost:3000/accounts",
@@ -53,9 +57,15 @@ $(() => {
       contentType: "application/json",
       dataType: "json",
     }).done((data) => {
-      let account_summary = $.map(data, (user) => {
+      const allUser = data.map((item) => {
+        const account = new Account(item.username, item.transactions);
+        return account;
+      });
+      console.log(allUser);
+      console.log(allUser.balance);
+      let account_summary = $.map(allUser, (user) => {
         return `
-                <li>Account Name: ${user.username}: Total Balance: ${user.transactions}</li>
+                <li>Account Name: ${user.username}: Total Balance: ${user.balance}</li>
               `;
       });
       $("#summary_list").append(account_summary);
@@ -118,7 +128,6 @@ $(() => {
               `;
       });
       categorySelect.prepend(categoryOption);
-      // $("#firstOption").remove();
     });
   });
 
@@ -158,27 +167,11 @@ $(() => {
       });
   });
 
-  $.ajax({
-    url: "http://localhost:3000/accounts",
-    type: "get",
-    contentType: "application/json",
-    dataType: "json",
-  }).done((data) => {
-    console.log(data);
-    const allUser = data.map(item =>{
-      const account = new Account(item.username, item.transactions);
-      return account;
-    })
-    // console.log(allUser);
-    // console.log(data.balance);
-  });
-
-
   //Add new transaction
   $("#transactionForm").submit((event) => {
     event.preventDefault();
-    if($("#description").val() === '' || $("#amount").val() === '' ){
-      alert("Pls enter valid description or amount")
+    if ($("#description").val() === "" || $("#amount").val() === "") {
+      alert("Pls enter valid description or amount");
       return;
     }
     const transactionType = $("input[name='transactionType']:checked").val();
@@ -190,33 +183,33 @@ $(() => {
     let userAccountIdFrom;
     let userAccountIdTo;
 
-    if(transactionType === "Deposit" || transactionType === "Withdraw"){
+    if (transactionType === "Deposit" || transactionType === "Withdraw") {
       userAccountId = $("#accountSelect").val();
       transactionUserName = $("[name=accountSelect] option:selected").text();
 
-      if(transactionType === "Deposit"){
+      if (transactionType === "Deposit") {
         transactionAmount = Number($("#amount").val());
-      }else{
+      } else {
         transactionAmount = -Number($("#amount").val());
       }
     }
-    if(transactionType === "Transfer"){
+    if (transactionType === "Transfer") {
       userAccountId = $("#fromSelect").val();
       transactionUserName = $("[name=fromSelect] option:selected").text();
       userAccountIdFrom = $("[name=fromSelect] option:selected").text();
       userAccountIdTo = $("[name=toSelect] option:selected").text();
 
-      if(transactionUserName === userAccountIdFrom){
+      if (transactionUserName === userAccountIdFrom) {
         transactionAmount = -Number($("#amount").val());
-      }else{
+      } else {
         transactionAmount = Number($("#amount").val());
       }
-    }else{
+    } else {
       userAccountIdFrom = null;
       userAccountIdTo = null;
     }
 
-    const newTransaction = {
+    const newTransactionData = {
       accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
       accountIdFrom: `${userAccountIdFrom}`, // sender ID if type = 'Transfer', otherwise null
       accountIdTo: `${userAccountIdTo}`, // receiver ID if type = 'Transfer', otherwise null
@@ -227,8 +220,7 @@ $(() => {
       description: `${transactionDescription}`,
       transactionAmount: `${transactionAmount}`,
     };
-
-    console.log(newTransaction);
+    console.log(newTransactionData);
 
     $.ajax({
       url: "http://localhost:3000/transaction",
@@ -236,11 +228,55 @@ $(() => {
       contentType: "application/json",
       dataType: "json",
       data: JSON.stringify({
-        newTransaction
+        newTransaction: newTransactionData,
       }),
     })
       .done((data) => {
+        //Update transaction table
         console.log(data);
+        const instancedTransaction = new Transaction(
+          data[0].userName,
+          data[0].transactionAmount
+        );
+          console.log(instancedTransaction);
+          // instancedTransaction.commit();
+        //Get user data to update their balance
+        $.ajax({
+          url: "http://localhost:3000/accounts",
+          type: "get",
+          dataType: "json",
+        }).done((data) =>{
+          $("#summary_list").empty();
+          console.log(data);
+          const userData = data.map((item)=>{
+            const instancedAccount = new Account(
+              item.username,
+              item.transactions
+            );
+            return instancedAccount;
+          });
+          console.log(userData);
+          let account_summary = $.map(userData, (user) => {
+            return `
+                <li>Account Name: ${user.username}: Total Balance: ${user.balance}</li>
+              `;
+          });
+          $("#summary_list").append(account_summary);
+          // let currentBalance = 0;
+          // $.each(data, (i, eachUser)=>{
+          //   console.log(eachUser.transactions);
+          //   for(let k = 0; k< eachUser.transactions.length; k++){
+          //     console.log(eachUser.transactions[k].transactionAmount);
+          //     currentBalance += Number(eachUser.transactions[k].transactionAmount);
+          //     console.log(currentBalance);
+          //   }
+          // })
+          // const allUser = data.map((item) => {
+          //   const account = new Account(item.username, item.transactions);
+          //   return account;
+          // });
+          // console.log(allUser, allUser[0].balance);
+        })
         $("#amount").val("");
         $("#description").val("");
         alert("New transaction added");
@@ -259,9 +295,7 @@ $(() => {
             </tr>
             `;
         });
-        // console.log(td);
         $("#transactionTable").append(td);
-
       })
       .fail((error) => {
         alert(error);
@@ -269,11 +303,10 @@ $(() => {
   });
 
   //Add new transaction table
-  function createTransactionTable (transactionData){
-    // const tr = (`<tr></tr>`);
-    $.each(transactionData, (index, Array)=>{
-      const td = $.map(Array, (item)=>{
-        return (`
+  function createTransactionTable(transactionData) {
+    $.each(transactionData, (index, Array) => {
+      const td = $.map(Array, (item) => {
+        return `
         <tr>
           <td>${item.id}</td>
           <td>${item.userName}</td>
@@ -284,11 +317,10 @@ $(() => {
           <td>${item.accountIdFrom}</td>
           <td>${item.accountIdTo}</td>
         </tr>
-        `)
-      })
-      // console.log(td);
+        `;
+      });
       $("#transactionTable").append(td);
-    })
+    });
   }
 
   $.ajax({
@@ -298,7 +330,6 @@ $(() => {
     dataType: "json",
   })
     .done((data) => {
-      console.log(data);
       createTransactionTable(data);
     })
     .fail((error) => {
