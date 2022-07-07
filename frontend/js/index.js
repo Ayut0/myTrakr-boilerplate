@@ -46,10 +46,15 @@ $(() => {
 
   //create user account summary list via data stored in server
   let userList = [];
-
-  // function createAccountSummary(){
-
-  // }
+  function createAccountSummary(userArray){
+    let account_summary = $.map(userArray, (user) => {
+      console.log(user)
+      return `
+                <li>Account Name: ${user.username}: Total Balance: ${user.transactions.length === 0? 0: user.balance}</li>
+              `;
+    });
+    $("#summary_list").append(account_summary);
+  }
   $(document).ready(() => {
     $.ajax({
       url: "http://localhost:3000/accounts",
@@ -62,13 +67,8 @@ $(() => {
         return account;
       });
       console.log(allUser);
-      console.log(allUser.balance);
-      let account_summary = $.map(allUser, (user) => {
-        return `
-                <li>Account Name: ${user.username}: Total Balance: ${user.balance}</li>
-              `;
-      });
-      $("#summary_list").append(account_summary);
+      // console.log(allUser.balance);
+      createAccountSummary(allUser)
       $.each(data, (index, value) => {
         createUserList(value.username, value.id, accountSelectList);
         createUserList(value.username, value.id, fromList);
@@ -238,8 +238,7 @@ $(() => {
           data[0].userName,
           data[0].transactionAmount
         );
-          console.log(instancedTransaction);
-          // instancedTransaction.commit();
+        // console.log(instancedTransaction);
         //Get user data to update their balance
         $.ajax({
           url: "http://localhost:3000/accounts",
@@ -256,12 +255,13 @@ $(() => {
             return instancedAccount;
           });
           console.log(userData);
-          let account_summary = $.map(userData, (user) => {
-            return `
-                <li>Account Name: ${user.username}: Total Balance: ${user.balance}</li>
-              `;
-          });
-          $("#summary_list").append(account_summary);
+          // let account_summary = $.map(userData, (user) => {
+          //   return `
+          //       <li>Account Name: ${user.username}: Total Balance: ${user.balance}</li>
+          //     `;
+          // });
+          // $("#summary_list").append(account_summary);
+          createAccountSummary(userData)
           // let currentBalance = 0;
           // $.each(data, (i, eachUser)=>{
           //   console.log(eachUser.transactions);
