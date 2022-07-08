@@ -23,7 +23,6 @@ $(() => {
         }),
       })
         .done((data) => {
-          console.log(data.id);
           userList.push(data.username);
           //Add a new user option tag
           createUserList(data.username, data.id, accountSelectList);
@@ -111,8 +110,9 @@ $(() => {
   const categoryInput = $("#categoryInput");
   const categorySelect = $("#categorySelect");
   const newCategoryButton = $("#categoryButton");
-  categoryInput.hide();
-  newCategoryButton.hide();
+  // categoryInput.hide();
+  // newCategoryButton.hide();
+  // console.log(categorySelect.children('option').length);
 
   //Create category list
   $(document).ready(() => {
@@ -144,6 +144,7 @@ $(() => {
 
   newCategoryButton.click((event) => {
     event.preventDefault();
+    // console.log(categorySelect.children("option").length);
     const categoryInputValue = categoryInput.val();
     //Form validation and adding new category
     categoryInputValue.length > 0 &&
@@ -167,11 +168,20 @@ $(() => {
       });
   });
 
-  //Add new transaction
+  let filteredAccount;
+  let targetAccount;
+  let targetAccountName;
+  let targetAccountBalance;
+
   $("#transactionForm").submit((event) => {
     event.preventDefault();
-    if ($("#description").val() === "" || $("#amount").val() === "") {
-      alert("Pls enter valid description or amount");
+    //Transaction amount should be greater than 0. Description is needed. Category should be given.
+    if (
+      $("#description").val() === "" ||
+      Number($("#amount").val()) < 0 ||
+      $("[name = category]").val() === "addNewCategory"
+    ) {
+      alert("Pls enter valid information");
       return;
     }
     const transactionType = $("input[name='transactionType']:checked").val();
@@ -183,6 +193,7 @@ $(() => {
     let userAccountIdFrom;
     let userAccountIdTo;
 
+    //Deposit and Withdraw
     if (transactionType === "Deposit" || transactionType === "Withdraw") {
       userAccountId = $("#accountSelect").val();
       transactionUserName = $("[name=accountSelect] option:selected").text();
@@ -193,11 +204,19 @@ $(() => {
         transactionAmount = -Number($("#amount").val());
       }
     }
+
+    //Transfer
     if (transactionType === "Transfer") {
       userAccountId = $("#fromSelect").val();
       transactionUserName = $("[name=fromSelect] option:selected").text();
       userAccountIdFrom = $("[name=fromSelect] option:selected").text();
       userAccountIdTo = $("[name=toSelect] option:selected").text();
+
+      //Check if the sender and receiver are the same account;
+      if (userAccountIdFrom === userAccountIdTo) {
+        alert("I'm afraid you're about to transfer money to the same account....");
+        return;
+      }
 
       if (transactionUserName === userAccountIdFrom) {
         transactionAmount = -Number($("#amount").val());
@@ -208,98 +227,113 @@ $(() => {
       userAccountIdFrom = null;
       userAccountIdTo = null;
     }
+    
+    function getCurrentBalance(){
+      return $.ajax({
+        url: "http://localhost:3000/accounts",
+        type: "get",
+        contentType: "application/json",
+        dataType: "json",
+      })
+    }
+    getCurrentBalance().done((data) => {
+      let currentBalanceData = data.map((element) => {
+        targetAccount = new Account(element.username, element.transactions);
+        return targetAccount;
+      });
+      // console.log(currentBalanceData);
+      //Filtered by name
+      filteredAccount = currentBalanceData.filter(
+        (account) => account.username === transactionUserName
+      );
+      // console.log(filteredAccount[0].username);
+      // console.log(filteredAccount[0].balance);
+      // console.log(filteredAccount[0])
+      targetAccountName = filteredAccount[0].username;
+      targetAccountBalance = filteredAccount[0].balance;
+      // console.log(targetAccountName, targetAccountBalance);
+      // console.log(transactionUserName, targetAccountName);
+      // console.log(Math.abs(transactionAmount), targetAccountBalance);
+    });
+  
+    if (
+      (transactionType === "Transfer" &&
+       Math.abs(transactionAmount) > targetAccountBalance) ||
+      (transactionType === "Withdraw" &&
+        Math.abs(transactionAmount) > targetAccountBalance)
+    ){
+      alert("You don't have enough balance for this transaction");
+      return;
+    }
 
-    const newTransactionData = {
-      accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
-      accountIdFrom: `${userAccountIdFrom}`, // sender ID if type = 'Transfer', otherwise null
-      accountIdTo: `${userAccountIdTo}`, // receiver ID if type = 'Transfer', otherwise null
-      // all info from form{{
-      userName: `${transactionUserName}`,
-      type: `${transactionType}`,
-      category: `${transactionCategory}`,
-      description: `${transactionDescription}`,
-      transactionAmount: `${transactionAmount}`,
-    };
-    console.log(newTransactionData);
+      const newTransactionData = {
+        accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
+        accountIdFrom: `${userAccountIdFrom}`, // sender ID if type = 'Transfer', otherwise null
+        accountIdTo: `${userAccountIdTo}`, // receiver ID if type = 'Transfer', otherwise null
+        // all info from form
+        userName: `${transactionUserName}`,
+        type: `${transactionType}`,
+        category: `${transactionCategory}`,
+        description: `${transactionDescription}`,
+        transactionAmount: `${transactionAmount}`,
+      };
 
-    $.ajax({
-      url: "http://localhost:3000/transaction",
-      type: "post",
-      contentType: "application/json",
-      dataType: "json",
-      data: JSON.stringify({
-        newTransaction: newTransactionData,
-      }),
-    })
-      .done((data) => {
-        //Update transaction table
-        console.log(data);
-        const instancedTransaction = new Transaction(
-          data[0].userName,
-          data[0].transactionAmount
-        );
-        // console.log(instancedTransaction);
-        //Get user data to update their balance
-        $.ajax({
-          url: "http://localhost:3000/accounts",
-          type: "get",
-          dataType: "json",
-        }).done((data) =>{
-          $("#summary_list").empty();
-          console.log(data);
-          const userData = data.map((item)=>{
-            const instancedAccount = new Account(
-              item.username,
-              item.transactions
-            );
-            return instancedAccount;
+      $.ajax({
+        url: "http://localhost:3000/transaction",
+        type: "post",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+          newTransaction: newTransactionData,
+        }),
+      })
+        .done((data) => {
+          //Update transaction table
+          const instancedTransaction = new Transaction(
+            data[0].userName,
+            data[0].transactionAmount
+          );
+          //Get user data to update their balance
+          $.ajax({
+            url: "http://localhost:3000/accounts",
+            type: "get",
+            dataType: "json",
+          }).done((data) => {
+            $("#summary_list").empty();
+            console.log(data);
+            const userData = data.map((item) => {
+              const instancedAccount = new Account(
+                item.username,
+                item.transactions
+              );
+              return instancedAccount;
+            });
+            createAccountSummary(userData);
           });
-          console.log(userData);
-          // let account_summary = $.map(userData, (user) => {
-          //   return `
-          //       <li>Account Name: ${user.username}: Total Balance: ${user.balance}</li>
-          //     `;
-          // });
-          // $("#summary_list").append(account_summary);
-          createAccountSummary(userData)
-          // let currentBalance = 0;
-          // $.each(data, (i, eachUser)=>{
-          //   console.log(eachUser.transactions);
-          //   for(let k = 0; k< eachUser.transactions.length; k++){
-          //     console.log(eachUser.transactions[k].transactionAmount);
-          //     currentBalance += Number(eachUser.transactions[k].transactionAmount);
-          //     console.log(currentBalance);
-          //   }
-          // })
-          // const allUser = data.map((item) => {
-          //   const account = new Account(item.username, item.transactions);
-          //   return account;
-          // });
-          // console.log(allUser, allUser[0].balance);
-        })
-        $("#amount").val("");
-        $("#description").val("");
-        alert("New transaction added");
 
-        const td = $.map(data, (item) => {
-          return `
+          const td = $.map(data, (item) => {
+            return `
             <tr>
-              <td>${item.id}</td>
-              <td>${item.userName}</td>
-              <td>${item.type}</td>
-              <td>${item.category}</td>
-              <td>${item.description}</td>
-              <td>${item.transactionAmount}</td>
-              <td>${item.accountIdFrom}</td>
-              <td>${item.accountIdTo}</td>
+            <td>${item.id}</td>
+            <td>${item.userName}</td>
+            <td>${item.type}</td>
+            <td>${item.category}</td>
+            <td>${item.description}</td>
+            <td>${item.transactionAmount}</td>
+            <td>${item.accountIdFrom}</td>
+            <td>${item.accountIdTo}</td>
             </tr>
             `;
+          });
+          $("#transactionTable").append(td);
+          $("#amount").val("");
+          $("#description").val("");
+          // alert("Your transaction went through!!");
+        })
+        .fail((error) => {
+          alert(error);
         });
-        $("#transactionTable").append(td);
-      })
-      .fail((error) => {
-        alert(error);
-      });
+    
   });
 
   //Add new transaction table
@@ -335,4 +369,5 @@ $(() => {
     .fail((error) => {
       alert(error);
     });
+
 });
