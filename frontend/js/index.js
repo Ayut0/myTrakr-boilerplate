@@ -144,7 +144,6 @@ $(() => {
 
   newCategoryButton.click((event) => {
     event.preventDefault();
-    // console.log(categorySelect.children("option").length);
     const categoryInputValue = categoryInput.val();
     //Form validation and adding new category
     categoryInputValue.length > 0 &&
@@ -214,7 +213,9 @@ $(() => {
 
       //Check if the sender and receiver are the same account;
       if (userAccountIdFrom === userAccountIdTo) {
-        alert("I'm afraid you're about to transfer money to the same account....");
+        alert(
+          "I'm afraid you're about to transfer money to the same account...."
+        );
         return;
       }
 
@@ -328,12 +329,12 @@ $(() => {
           $("#transactionTable").append(td);
           $("#amount").val("");
           $("#description").val("");
-          // alert("Your transaction went through!!");
         })
         .fail((error) => {
           alert(error);
         });
-    
+
+    alert("Your transaction went through!!");
   });
 
   //Add new transaction table
@@ -369,5 +370,6 @@ $(() => {
     .fail((error) => {
       alert(error);
     });
+
 
 });
