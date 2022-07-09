@@ -26,5 +26,6 @@ class Transfer extends Transaction{
   constructor(accountIdFrom, accountIdTo){
     this.accountIdFrom = accountIdFrom;
     this.accountIdTo = accountIdTo;
+    super(accountIdFrom, accountIdTo)
   }
 }

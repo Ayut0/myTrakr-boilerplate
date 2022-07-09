@@ -28,6 +28,7 @@ $(() => {
           createUserList(data.username, data.id, accountSelectList);
           createUserList(data.username, data.id, fromList);
           createUserList(data.username, data.id, toList);
+          createUserList(value.username, value.id, filterSelectList);
           //create user account summary
           $("#summary_list").append(`
                   <li>Account Name: ${data.username}: Total Balance: ${data.transactions}</li>
@@ -54,6 +55,7 @@ $(() => {
     });
     $("#summary_list").append(account_summary);
   }
+
   $(document).ready(() => {
     $.ajax({
       url: "http://localhost:3000/accounts",
@@ -72,6 +74,7 @@ $(() => {
         createUserList(value.username, value.id, accountSelectList);
         createUserList(value.username, value.id, fromList);
         createUserList(value.username, value.id, toList);
+        createUserList(value.username, value.id, filterSelectList);
       });
     });
   });
@@ -85,6 +88,7 @@ $(() => {
   const accountSelectList = $("#accountSelect");
   const fromList = $("#fromSelect");
   const toList = $("#toSelect");
+  const filterSelectList = $("#filterSelect")
 
   //Show and hide select buttons
   const fromSelect = $("#fromButton");
@@ -242,19 +246,13 @@ $(() => {
         targetAccount = new Account(element.username, element.transactions);
         return targetAccount;
       });
-      // console.log(currentBalanceData);
       //Filtered by name
       filteredAccount = currentBalanceData.filter(
         (account) => account.username === transactionUserName
       );
-      // console.log(filteredAccount[0].username);
-      // console.log(filteredAccount[0].balance);
-      // console.log(filteredAccount[0])
+
       targetAccountName = filteredAccount[0].username;
       targetAccountBalance = filteredAccount[0].balance;
-      // console.log(targetAccountName, targetAccountBalance);
-      // console.log(transactionUserName, targetAccountName);
-      // console.log(Math.abs(transactionAmount), targetAccountBalance);
     });
   
     if (
@@ -309,26 +307,28 @@ $(() => {
               );
               return instancedAccount;
             });
+            console.log(userData)
             createAccountSummary(userData);
           });
 
           const td = $.map(data, (item) => {
             return `
-            <tr>
-            <td>${item.id}</td>
-            <td>${item.userName}</td>
-            <td>${item.type}</td>
-            <td>${item.category}</td>
-            <td>${item.description}</td>
-            <td>${item.transactionAmount}</td>
-            <td>${item.accountIdFrom}</td>
-            <td>${item.accountIdTo}</td>
+            <tr class="transactionRow">
+              <td>${item.id}</td>
+              <td>${item.userName}</td>
+              <td>${item.type}</td>
+              <td>${item.category}</td>
+              <td>${item.description}</td>
+              <td>${item.transactionAmount}</td>
+              <td>${item.accountIdFrom}</td>
+              <td>${item.accountIdTo}</td>
             </tr>
             `;
           });
           $("#transactionTable").append(td);
           $("#amount").val("");
           $("#description").val("");
+
         })
         .fail((error) => {
           alert(error);
@@ -342,7 +342,7 @@ $(() => {
     $.each(transactionData, (index, Array) => {
       const td = $.map(Array, (item) => {
         return `
-        <tr>
+        <tr class="transactionRow">
           <td>${item.id}</td>
           <td>${item.userName}</td>
           <td>${item.type}</td>
@@ -358,18 +358,82 @@ $(() => {
     });
   }
 
-  $.ajax({
-    url: "http://localhost:3000/transactions",
-    type: "get",
-    contentType: "application/json",
-    dataType: "json",
-  })
-    .done((data) => {
-      createTransactionTable(data);
-    })
-    .fail((error) => {
-      alert(error);
+  function createTransactionTableByAccounts(accountData){
+    const td = $.map(accountData, (item) => {
+      return `
+        <tr class="transactionRow">
+          <td>${item.id}</td>
+          <td>${item.userName}</td>
+          <td>${item.type}</td>
+          <td>${item.category}</td>
+          <td>${item.description}</td>
+          <td>${item.transactionAmount}</td>
+          <td>${item.accountIdFrom}</td>
+          <td>${item.accountIdTo}</td>
+        </tr>
+        `;
     });
+    $("#transactionTable").append(td);
+  }
 
+  //Update transaction table
+  function updateTransactionTable(){
+    $.ajax({
+      url: "http://localhost:3000/transactions",
+      type: "get",
+      contentType: "application/json",
+      dataType: "json",
+    })
+      .done((data) => {
+        console.log(data);
+        createTransactionTable(data);
+      })
+      .fail((error) => {
+        alert(error);
+      });
+  }
+  updateTransactionTable()
 
+    //Filter transaction
+    //Get user name from account
+    $(filterSelectList).change((e) => {
+      console.log($("[name=filterSelect] option:selected").text());
+      const filteredName = $("[name=filterSelect] option:selected").text();
+      const filteredValue = $("[name=filterSelect] option:selected").val()
+      $.ajax({
+      url: "http://localhost:3000/accounts",
+      type: "get",
+      contentType: "application/json",
+      dataType: "json",
+    }).done((data) => {
+      const allUser = data.map((item) => {
+        const account = new Account(item.username, item.transactions);
+        return account;
+      });
+      if(filteredName !== "All"){
+        const filteredAccountData = allUser[Number(filteredValue) - 1];
+        const filteredTd = $.map(filteredAccountData.transactions, (item) => {
+          return `
+              <tr class="transactionRow">
+                <td>${item.id}</td>
+                <td>${item.userName}</td>
+                <td>${item.type}</td>
+                <td>${item.category}</td>
+                <td>${item.description}</td>
+                <td>${item.transactionAmount}</td>
+                <td>${item.accountIdFrom}</td>
+                <td>${item.accountIdTo}</td>
+              </tr>
+              `;
+        });
+        $(".transactionRow").empty();
+        $("#transactionTable").append(filteredTd);
+      }else{
+        $(".transactionRow").empty();
+        updateTransactionTable();
+      }
+    }).fail((error) => {
+          alert(error);
+        });
+  });
 });
