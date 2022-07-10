@@ -313,7 +313,7 @@ $(() => {
 
           const td = $.map(data, (item) => {
             return `
-            <tr class="transactionRow">
+            <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
               <td>${item.id}</td>
               <td>${item.userName}</td>
               <td>${item.type}</td>
@@ -342,7 +342,7 @@ $(() => {
     $.each(transactionData, (index, Array) => {
       const td = $.map(Array, (item) => {
         return `
-        <tr class="transactionRow">
+        <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
           <td>${item.id}</td>
           <td>${item.userName}</td>
           <td>${item.type}</td>
@@ -361,7 +361,7 @@ $(() => {
   function createTransactionTableByAccounts(accountData){
     const td = $.map(accountData, (item) => {
       return `
-        <tr class="transactionRow">
+        <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
           <td>${item.id}</td>
           <td>${item.userName}</td>
           <td>${item.type}</td>
@@ -414,7 +414,7 @@ $(() => {
         const filteredAccountData = allUser[Number(filteredValue) - 1];
         const filteredTd = $.map(filteredAccountData.transactions, (item) => {
           return `
-              <tr class="transactionRow">
+              <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
                 <td>${item.id}</td>
                 <td>${item.userName}</td>
                 <td>${item.type}</td>
