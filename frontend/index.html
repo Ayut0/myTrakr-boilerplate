@@ -55,28 +55,28 @@
                 </div>
               </div>
     
-              <div class="accountButton flex" id="accountButton">
+              <div class="accountButton flex mb-2" id="accountButton">
                 <label for="accountSelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Account:</label>
                 <select id="accountSelect" name="accountSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
               </div>
-              <div class="fromButton flex" id="fromButton">
+              <div class="fromButton flex mb-2" id="fromButton">
                 <label for="fromSelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">From:</label>
                 <select id="fromSelect" name="fromSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
               </div>
-              <div class="toButton flex" id="toButton">
+              <div class="toButton flex mb-2" id="toButton">
                 <label for="toSelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">To:</label>
                 <select id="toSelect" name="toSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
               </div>
     
-              <div class="category flex justify-around items-center w-2/3">
+              <div class="category flex justify-around items-center w-2/3 mb-4">
                 <label for="category">Category</label>
-                <select name="category" id="categorySelect" required>
+                <select name="category" id="categorySelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                   <option value="addNewCategory">Add new category</option>
                 </select>
                 <input type="text" id="categoryInput" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Category name"/>
                 <button type="button" id="categoryButton" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add new category</button>
               </div>
-              <div class="transaction__detail flex justify-around w-2/3 items-center">
+              <div class="transaction__detail flex justify-around w-2/3 items-center mb-4">
                 <label for="description">Description</label>
                 <input type="text" id="description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Description" required/>
     
@@ -95,7 +95,7 @@
     
           <section id="account_filter">
             <h2 class="text-3xl">Filter by account</h2>
-            <select id="filterSelect" name="filterSelect">
+            <select id="filterSelect" name="filterSelect" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
               <option value="">All</option>
             </select>
           </section>
