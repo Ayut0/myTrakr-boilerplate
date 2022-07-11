@@ -28,7 +28,7 @@ $(() => {
             createUserList(data.username, data.id, accountSelectList);
             createUserList(data.username, data.id, fromList);
             createUserList(data.username, data.id, toList);
-            createUserList(value.username, data.id, filterSelectList);
+            createUserList(data.username, data.id, filterSelectList);
             //create user account summary
             $("#summary_list").append(`
                     <li>Account Name: ${data.username}: Total Balance: ${data.transactions}</li>
@@ -55,28 +55,27 @@ $(() => {
       });
       $("#summary_list").append(account_summary);
     }
-  
-    $(document).ready(() => {
-      $.ajax({
-        url: "http://localhost:3000/accounts",
-        type: "get",
-        contentType: "application/json",
-        dataType: "json",
-      }).done((data) => {
-        const allUser = data.map((item) => {
-          const account = new Account(item.username, item.transactions);
-          return account;
-        });
-        createAccountSummary(allUser)
-        $.each(data, (index, value) => {
-          createUserList(value.username, value.id, accountSelectList);
-          createUserList(value.username, value.id, fromList);
-          createUserList(value.username, value.id, toList);
-          createUserList(value.username, value.id, filterSelectList);
-        });
+
+    $.ajax({
+      url: "http://localhost:3000/accounts",
+      type: "get",
+      contentType: "application/json",
+      dataType: "json",
+    }).done((data) => {
+      const allUser = data.map((item) => {
+        const account = new Account(item.username, item.transactions);
+        return account;
+      });
+      createAccountSummary(allUser)
+      $.each(data, (index, value) => {
+        createUserList(value.username, value.id, accountSelectList);
+        createUserList(value.username, value.id, fromList);
+        createUserList(value.username, value.id, toList);
+        createUserList(value.username, value.id, filterSelectList);
       });
     });
-  
+
+
     // Function creates a user list
     function createUserList(newUserName, newUserId, selectTag) {
       return selectTag.append(`
@@ -104,17 +103,14 @@ $(() => {
         fromSelect.show();
         toSelect.show();
       }
-  
+
       checkedRadio === "Transfer" ? accountSelect.hide() : accountSelect.show();
     });
-  
+
     //Add new category
     const categoryInput = $("#categoryInput");
     const categorySelect = $("#categorySelect");
     const newCategoryButton = $("#categoryButton");
-    // categoryInput.hide();
-    // newCategoryButton.hide();
-    // console.log(categorySelect.children('option').length);
   
     //Create category list
     $(document).ready(() => {
@@ -383,7 +379,6 @@ $(() => {
         dataType: "json",
       })
         .done((data) => {
-          console.log(data);
           createTransactionTable(data);
         })
         .fail((error) => {
