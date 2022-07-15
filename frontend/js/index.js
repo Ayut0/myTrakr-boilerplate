@@ -2,17 +2,24 @@ $(() => {
   //Start coding here!
   $(document).ready(() => {
     //Creating new account
+    let userList = [];
     $("#accountForm").submit((event) => {
       event.preventDefault();
       const newAccountName = $("#account_input").val();
-      if (newAccountName === "" || $.inArray(newAccountName, userList) !== -1) {
+      //Validations
+      if (newAccountName === "") {
         alert("Pls enter valid user name");
-      } else {
+      }
+      if($.inArray(newAccountName, userList) !== -1){
+        alert("This user already exists")
+      }
+      else {
         //Create New Account
         const newAccount = {
           username: `${newAccountName}`,
           transactions: [],
         };
+        // createNewAccount(newAccount)
         $.ajax({
           url: "http://localhost:3000/accounts",
           type: "post",
@@ -29,23 +36,23 @@ $(() => {
             createUserList(data.username, data.id, fromList);
             createUserList(data.username, data.id, toList);
             createUserList(data.username, data.id, filterSelectList);
+            const account = new Account(data.username, data.transactions);
             //create user account summary
             $("#summary_list").append(`
-                    <li>Account Name: ${data.username}: Total Balance: ${data.transactions}</li>
+                    <li>Account Name: ${account.username}: Total Balance: ${
+              account.transactions.length === 0 ? 0 : account.balance
+            }</li>
                 `);
             //Reset input
             $("#account_input").val("");
             alert("New account added");
-            // return userList;
           })
           .fail((error) => {
             alert(error);
           });
       }
     });
-  
     //create user account summary list via data stored in server
-    let userList = [];
     function createAccountSummary(userArray){
       let account_summary = $.map(userArray, (user) => {
         console.log(user)
