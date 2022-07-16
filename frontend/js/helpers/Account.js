@@ -1,4 +1,4 @@
-class Account {
+export class Account {
   constructor(username, transactions) {
     this.username = username;
     this.transactions = transactions;
@@ -15,6 +15,7 @@ const accountSelectList = $("#accountSelect");
 const fromList = $("#fromSelect");
 const toList = $("#toSelect");
 const filterSelectList = $("#filterSelect");
+
 
 // create user account summary list via data stored in server
     export const createAccountSummary = (account) => {
@@ -44,7 +45,6 @@ const filterSelectList = $("#filterSelect");
     data: JSON.stringify({ newAccount }),
   })
     .done((data) => {
-      console.log(data);
       //Add a new user option tag
       const account = new Account(data.newAccountName, data.transactions);
       console.log(account)
@@ -64,12 +64,58 @@ const filterSelectList = $("#filterSelect");
 };
 
 //Get user data
-export const getUserData = ()=>{
+export const updateUserList = ()=>{
   $.ajax({
     url: "http://localhost:3000/accounts",
     type: "get",
     dataType: "json",
   }).done((data) => {
-    console.log(data);
+    // console.log(data);
+    //Add a new user option tag
+    const userData = data.map(user =>{
+      return new Account(user.newAccountName, user.transactions);
+    });
+    // console.log(userData);
+    // const account = new Account(data.newAccountName, data.transactions);
+    // console.log(account);
+    userData.forEach(element => {
+      createUserList(element.username, element.id, accountSelectList);
+      createUserList(element.username, element.id, fromList);
+      createUserList(element.username, element.id, toList);
+      createUserList(element.username, element.id, filterSelectList);
+      //create user account summary
+      createAccountSummary(element);
+    });
   });
 }
+updateUserList();
+
+//Get current balance
+export const getUserData = ()=> {
+  return $.ajax({
+    url: "http://localhost:3000/accounts",
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+  });
+}
+
+let filteredAccount;
+let targetAccount;
+let targetAccountName;
+let targetAccountBalance;
+let transactionUserName;
+
+getUserData().done((data) => {
+  let currentBalanceData = data.map((element) => {
+    targetAccount = new Account(element.username, element.transactions);
+    return targetAccount;
+  });
+  //Filtered by name
+  filteredAccount = currentBalanceData.filter(
+    (account) => account.username === transactionUserName
+  );
+
+  targetAccountName = filteredAccount[0].username;
+  targetAccountBalance = filteredAccount[0].balance;
+});

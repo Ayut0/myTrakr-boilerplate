@@ -1,5 +1,13 @@
-import { postNewAccount, getUserData } from "./helpers/Account.js";
+import {
+  postNewAccount,
+  updateUserList,
+  getUserData,
+} from "./helpers/Account.js";
 import { postNewCategory } from "./helpers/Category.js";
+import {
+  validatedTransaction,
+  postNewTransaction,
+} from "./helpers/Transaction.js";
 
 $(() => {
   //Start coding here!
@@ -8,8 +16,6 @@ $(() => {
   $("#accountForm").submit((event) => {
     event.preventDefault();
     const newAccountName = $("#account_input").val();
-    userList.push(newAccountName);
-    console.log(userList);
     //Validations
     if (newAccountName === "") {
       alert("Pls enter valid user name");
@@ -19,12 +25,14 @@ $(() => {
       alert("This user already exists");
       return;
     }
+    userList.push(newAccountName);
+    console.log(userList);
     const newAccount = {
       newAccountName,
       transactions: [],
     };
     postNewAccount(newAccount);
-    getUserData();
+    updateUserList();
   });
 
   //Show and hide select buttons based on transaction type
@@ -35,7 +43,7 @@ $(() => {
   //Get value of ratio buttons
   $("input:radio[name='transactionType']").change(() => {
     let checkedRadio = $("input:radio[name='transactionType']:checked").val();
-    console.log(checkedRadio);
+    // console.log(checkedRadio);
     if (checkedRadio === "Deposit" || checkedRadio === "Withdraw") {
       fromSelect.hide();
       toSelect.hide();
@@ -52,22 +60,6 @@ $(() => {
   const newCategoryButton = $("#categoryButton");
 
   //Create category list
-  $(document).ready(() => {
-    $.ajax({
-      url: "http://localhost:3000/categories",
-      type: "get",
-      contentType: "application/json",
-      dataType: "json",
-    }).done((data) => {
-      let categoryOption = $.map(data, (item) => {
-        return `
-               <option value=${item.name.categoryName}>${item.name.categoryName}</option>
-              `;
-      });
-      categorySelect.prepend(categoryOption);
-    });
-  });
-
   categorySelect.change((event) => {
     event.preventDefault();
     if ($("[name = category]").val() === "addNewCategory") {
@@ -84,88 +76,77 @@ $(() => {
     const categoryInputValue = categoryInput.val();
     //Form validation and adding new category
     categoryInputValue.length > 0 && postNewCategory(categoryInputValue);
-      // $.ajax({
-      //   url: "http://localhost:3000/categories",
-      //   type: "post",
-      //   contentType: "application/json",
-      //   dataType: "json",
-      //   data: JSON.stringify({
-      //     newCategory: {
-      //       categoryName: categoryInputValue,
-      //     },
-      //   }),
-      // }).done((data) => {
-      //   const newCategoryOption = new Option(categoryInputValue);
-      //   $("#firstOption").remove();
-      //   categorySelect.prepend(newCategoryOption);
-      //   categoryInput.hide();
-      //   newCategoryButton.hide();
-      //   categoryInput.val("");
-      // });
   });
 
-  let filteredAccount;
-  let targetAccount;
-  let targetAccountName;
-  let targetAccountBalance;
+  // let filteredAccount;
+  // let targetAccount;
+  // let targetAccountName;
+  // let targetAccountBalance;
 
+  //Transaction
   $("#transactionForm").submit((event) => {
     event.preventDefault();
     //Transaction amount should be greater than 0. Description is needed. Category should be given.
-    if (
-      $("#description").val() === "" ||
-      Number($("#amount").val()) < 0 ||
-      $("[name = category]").val() === "addNewCategory"
-    ) {
-      alert("Pls enter valid information");
+    if ( $("#description").val() === "" ){
+      alert("Please enter description")
+      return
+    } else if (Number($("#amount").val()) < 0){
+      alert("Transaction amount should be greater than 0");
+      return
+    }else if($("[name = category]").val() === "addNewCategory"){
+      alert("Please enter valid category");
       return;
     }
+
     const transactionType = $("input[name='transactionType']:checked").val();
     const transactionCategory = categorySelect.val();
-    let transactionAmount;
     const transactionDescription = $("#description").val();
+    let transactionAmount;
     let transactionUserName;
     let userAccountId;
     let userAccountIdFrom;
     let userAccountIdTo;
 
-    //Deposit and Withdraw
-    if (transactionType === "Deposit" || transactionType === "Withdraw") {
-      userAccountId = $("#accountSelect").val();
-      transactionUserName = $("[name=accountSelect] option:selected").text();
+    validatedTransaction(transactionType);
 
-      if (transactionType === "Deposit") {
-        transactionAmount = Number($("#amount").val());
-      } else {
-        transactionAmount = -Number($("#amount").val());
-      }
-    }
+    //Deposit and Withdraw
+    // if (transactionType === "Deposit" || transactionType === "Withdraw") {
+    //   userAccountId = $("#accountSelect").val();
+    //   transactionUserName = $("[name=accountSelect] option:selected").text();
+
+    //   if (transactionType === "Deposit") {
+    //     transactionAmount = Number($("#amount").val());
+    //   } else {
+    //     transactionAmount = -Number($("#amount").val());
+    //   }
+    // }
 
     //Transfer
-    if (transactionType === "Transfer") {
-      userAccountId = $("#fromSelect").val();
-      transactionUserName = $("[name=fromSelect] option:selected").text();
-      userAccountIdFrom = $("[name=fromSelect] option:selected").text();
-      userAccountIdTo = $("[name=toSelect] option:selected").text();
+    // if (transactionType === "Transfer") {
+    //   userAccountId = $("#fromSelect").val();
+    //   transactionUserName = $("[name=fromSelect] option:selected").text();
+    //   userAccountIdFrom = $("[name=fromSelect] option:selected").text();
+    //   userAccountIdTo = $("[name=toSelect] option:selected").text();
 
-      //Check if the sender and receiver are the same account;
-      if (userAccountIdFrom === userAccountIdTo) {
-        alert(
-          "I'm afraid you're about to transfer money to the same account...."
-        );
-        return;
-      }
+    //   //Check if the sender and receiver are the same account;
+    //   if (userAccountIdFrom === userAccountIdTo) {
+    //     alert(
+    //       "I'm afraid you're about to transfer money to the same account...."
+    //     );
+    //     return;
+    //   }
 
-      if (transactionUserName === userAccountIdFrom) {
-        transactionAmount = -Number($("#amount").val());
-      } else {
-        transactionAmount = Number($("#amount").val());
-      }
-    } else {
-      userAccountIdFrom = null;
-      userAccountIdTo = null;
-    }
+    //   if (transactionUserName === userAccountIdFrom) {
+    //     transactionAmount = -Number($("#amount").val());
+    //   } else {
+    //     transactionAmount = Number($("#amount").val());
+    //   }
+    // } else {
+    //   userAccountIdFrom = null;
+    //   userAccountIdTo = null;
+    // }
 
+    //Check the balance
     function getCurrentBalance() {
       return $.ajax({
         url: "http://localhost:3000/accounts",
@@ -372,5 +353,3 @@ $(() => {
   //     });
   // });
 });
-//   $(document).ready(() => {
-// });
