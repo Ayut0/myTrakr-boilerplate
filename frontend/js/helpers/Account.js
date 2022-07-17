@@ -45,14 +45,12 @@ export const postNewAccount = (account) => {
     data: JSON.stringify({ newAccount }),
   })
     .done((data) => {
-      console.log(data);
       //Add a new user option tag
       const account = new Account(
         data.newAccountName,
         data.transactions,
         data.id
       );
-      console.log(account);
       createUserList(account.username, account.id, accountSelectList);
       createUserList(account.username, account.id, fromList);
       createUserList(account.username, account.id, toList);
@@ -92,11 +90,7 @@ export const updateUserList = () => {
 };
 updateUserList();
 
-let filteredAccount;
 let targetAccount;
-let targetAccountName;
-let targetAccountBalance;
-let transactionUserName;
 //Get current balance
 export const getUserData = () => {
   return $.ajax({
@@ -105,7 +99,6 @@ export const getUserData = () => {
     contentType: "application/json",
     dataType: "json",
   }).done((data) => {
-    console.log(data);
     let currentBalanceData = data.map((element) => {
       targetAccount = new Account(
         element.newAccountName,
@@ -115,5 +108,8 @@ export const getUserData = () => {
       return targetAccount;
     });
     console.log(currentBalanceData);
+    currentBalanceData.forEach((user) => {
+      createAccountSummary(user);
+    });
   });
 };
