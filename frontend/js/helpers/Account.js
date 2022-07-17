@@ -1,12 +1,13 @@
 export class Account {
-  constructor(username, transactions) {
+  constructor(username, transactions, id) {
     this.username = username;
     this.transactions = transactions;
+    this.id = id;
   }
 
   get balance() {
     return this.transactions.reduce((total, transaction) => {
-      return total + Number(transaction.transactionAmount);
+      return total + Number(transaction.amount);
     }, 0);
   }
 }
@@ -16,27 +17,26 @@ const fromList = $("#fromSelect");
 const toList = $("#toSelect");
 const filterSelectList = $("#filterSelect");
 
-
 // create user account summary list via data stored in server
-    export const createAccountSummary = (account) => {
-      const accountSummary = `
+export const createAccountSummary = (account) => {
+  const accountSummary = `
       <li>Account Name: ${account.username}: Total Balance: ${
-        account.transactions.length === 0 ? 0 : account.balance
-      }</li>
+    account.transactions.length === 0 ? 0 : account.balance
+  }</li>
     `;
-      $("#summary_list").append(accountSummary);
-    };
+  $("#summary_list").append(accountSummary);
+};
 
-  // Function creates a user list
-    export const createUserList = (newUserName, newUserId, selectTag)=> {
-      return selectTag.append(`
+// Function creates a user list
+export const createUserList = (newUserName, newUserId, selectTag) => {
+  return selectTag.append(`
         <option value=${newUserId}>${newUserName}</option>
         `);
-    };
+};
 
-  //post new account
-  export const postNewAccount = (account)=>{
-    const newAccount = {...account}
+//post new account
+export const postNewAccount = (account) => {
+  const newAccount = { ...account };
   $.ajax({
     url: "http://localhost:3000/accounts",
     method: "post",
@@ -45,9 +45,14 @@ const filterSelectList = $("#filterSelect");
     data: JSON.stringify({ newAccount }),
   })
     .done((data) => {
+      console.log(data);
       //Add a new user option tag
-      const account = new Account(data.newAccountName, data.transactions);
-      console.log(account)
+      const account = new Account(
+        data.newAccountName,
+        data.transactions,
+        data.id
+      );
+      console.log(account);
       createUserList(account.username, account.id, accountSelectList);
       createUserList(account.username, account.id, fromList);
       createUserList(account.username, account.id, toList);
@@ -64,21 +69,18 @@ const filterSelectList = $("#filterSelect");
 };
 
 //Get user data
-export const updateUserList = ()=>{
+export const updateUserList = () => {
   $.ajax({
     url: "http://localhost:3000/accounts",
     type: "get",
     dataType: "json",
   }).done((data) => {
-    // console.log(data);
     //Add a new user option tag
-    const userData = data.map(user =>{
-      return new Account(user.newAccountName, user.transactions);
+    const userData = data.map((user) => {
+      return new Account(user.newAccountName, user.transactions, user.id);
     });
-    // console.log(userData);
-    // const account = new Account(data.newAccountName, data.transactions);
-    // console.log(account);
-    userData.forEach(element => {
+    const account = new Account(data.newAccountName, data.transactions);
+    userData.forEach((element) => {
       createUserList(element.username, element.id, accountSelectList);
       createUserList(element.username, element.id, fromList);
       createUserList(element.username, element.id, toList);
@@ -87,35 +89,31 @@ export const updateUserList = ()=>{
       createAccountSummary(element);
     });
   });
-}
+};
 updateUserList();
-
-//Get current balance
-export const getUserData = ()=> {
-  return $.ajax({
-    url: "http://localhost:3000/accounts",
-    type: "get",
-    contentType: "application/json",
-    dataType: "json",
-  });
-}
 
 let filteredAccount;
 let targetAccount;
 let targetAccountName;
 let targetAccountBalance;
 let transactionUserName;
-
-getUserData().done((data) => {
-  let currentBalanceData = data.map((element) => {
-    targetAccount = new Account(element.username, element.transactions);
-    return targetAccount;
+//Get current balance
+export const getUserData = () => {
+  return $.ajax({
+    url: "http://localhost:3000/accounts",
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+  }).done((data) => {
+    console.log(data);
+    let currentBalanceData = data.map((element) => {
+      targetAccount = new Account(
+        element.newAccountName,
+        element.transactions,
+        element.id
+      );
+      return targetAccount;
+    });
+    console.log(currentBalanceData);
   });
-  //Filtered by name
-  filteredAccount = currentBalanceData.filter(
-    (account) => account.username === transactionUserName
-  );
-
-  targetAccountName = filteredAccount[0].username;
-  targetAccountBalance = filteredAccount[0].balance;
-});
+};

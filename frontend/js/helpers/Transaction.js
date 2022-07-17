@@ -1,5 +1,14 @@
 export class Transaction {
-  constructor(amount, account, accountIdFrom, accountIdTo, type, category, description) {
+  constructor(
+    amount,
+    account,
+    accountIdFrom,
+    accountIdTo,
+    type,
+    category,
+    description,
+    id
+  ) {
     this.amount = amount;
     this.account = account;
     this.accountIdFrom = accountIdFrom;
@@ -7,6 +16,7 @@ export class Transaction {
     this.type = type;
     this.category = category;
     this.description = description;
+    this.id = id;
   }
   commit() {
     if (this.value < 0 && this.amount > this.account.balance) return;
@@ -27,11 +37,11 @@ class Deposit extends Transaction {
   }
 }
 
-class Transfer extends Transaction{
-  constructor(accountIdFrom, accountIdTo){
+class Transfer extends Transaction {
+  constructor(accountIdFrom, accountIdTo) {
+    super(accountIdFrom, accountIdTo);
     this.accountIdFrom = accountIdFrom;
     this.accountIdTo = accountIdTo;
-    super(accountIdFrom, accountIdTo)
   }
 }
 
@@ -45,7 +55,7 @@ let userAccountIdTo;
 // let targetAccountName;
 // let targetAccountBalance;
 
-export const validatedTransaction = (typeOfTransaction)=>{
+export const validatedTransaction = (typeOfTransaction) => {
   //Deposit and Withdraw
   if (typeOfTransaction === "Deposit" || typeOfTransaction === "Withdraw") {
     userAccountId = $("#accountSelect").val();
@@ -82,9 +92,46 @@ export const validatedTransaction = (typeOfTransaction)=>{
     userAccountIdFrom = null;
     userAccountIdTo = null;
   }
-}
+};
 
-export const postNewTransaction = (transactionData) =>{
+export const generateTransaction = (data, type) => {
+  if (type === "Transfer") {
+    return new Transfer(
+      data.amount,
+      data.account,
+      data.accountIdFrom,
+      data.accountIdTo,
+      data.type,
+      data.category,
+      data.description,
+      data.id
+    );
+  } else if (type === "Deposit") {
+    return new Deposit(
+      data.amount,
+      data.account,
+      data.accountIdFrom,
+      data.accountIdTo,
+      data.type,
+      data.category,
+      data.description,
+      data.id
+    );
+  } else if (type === "Withdraw") {
+    return new Withdrawal(
+      data.amount,
+      data.account,
+      data.accountIdFrom,
+      data.accountIdTo,
+      data.type,
+      data.category,
+      data.description,
+      data.id
+    );
+  }
+};
+
+export const postNewTransaction = (transactionData) => {
   $.ajax({
     url: "http://localhost:3000/transaction",
     type: "post",
@@ -95,11 +142,8 @@ export const postNewTransaction = (transactionData) =>{
     }),
   })
     .done((data) => {
+      console.log(data);
       //Update transaction table
-      const instancedTransaction = new Transaction(
-        data[0].userName,
-        data[0].transactionAmount
-      );
       //Get user data to update their balance
       $.ajax({
         url: "http://localhost:3000/accounts",
@@ -117,28 +161,21 @@ export const postNewTransaction = (transactionData) =>{
         });
         console.log(userData);
       });
-
-      const td = $.map(data, (item) => {
-        return `
-            <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
-              <td>${item.id}</td>
-              <td>${item.userName}</td>
-              <td>${item.type}</td>
-              <td>${item.category}</td>
-              <td>${item.description}</td>
-              <td>${item.transactionAmount}</td>
-              <td>${item.accountIdFrom}</td>
-              <td>${item.accountIdTo}</td>
-            </tr>
-            `;
-      });
-      $("#transactionTable").append(td);
       $("#amount").val("");
       $("#description").val("");
     })
     .fail((error) => {
       alert(error);
-    });;
+    });
 
   alert("Your transaction went through!!");
-}
+};
+
+export const getTransactionData = () => {
+  return $.ajax({
+    url: "http://localhost:3000/transactions",
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+  });
+};
