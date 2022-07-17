@@ -1,6 +1,6 @@
 const categoryInput = $("#categoryInput");
 const categorySelect = $("#categorySelect");
-// const newCategoryButton = $("#categoryButton");
+const newCategoryButton = $("#categoryButton");
 
 export const postNewCategory = (categoryInputValue)=>{
     $.ajax({
