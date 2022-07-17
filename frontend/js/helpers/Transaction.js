@@ -132,7 +132,7 @@ export const generateTransaction = (data, type) => {
 };
 
 export const postNewTransaction = (transactionData) => {
-  $.ajax({
+  return $.ajax({
     url: "http://localhost:3000/transaction",
     type: "post",
     contentType: "application/json",
@@ -140,35 +140,7 @@ export const postNewTransaction = (transactionData) => {
     data: JSON.stringify({
       newTransaction: transactionData,
     }),
-  })
-    .done((data) => {
-      console.log(data);
-      //Update transaction table
-      //Get user data to update their balance
-      $.ajax({
-        url: "http://localhost:3000/accounts",
-        type: "get",
-        dataType: "json",
-      }).done((data) => {
-        $("#summary_list").empty();
-        console.log(data);
-        const userData = data.map((item) => {
-          const instancedAccount = new Account(
-            item.username,
-            item.transactions
-          );
-          return instancedAccount;
-        });
-        console.log(userData);
-      });
-      $("#amount").val("");
-      $("#description").val("");
-    })
-    .fail((error) => {
-      alert(error);
-    });
-
-  alert("Your transaction went through!!");
+  });
 };
 
 export const getTransactionData = () => {
@@ -178,4 +150,20 @@ export const getTransactionData = () => {
     contentType: "application/json",
     dataType: "json",
   });
+};
+
+export const createTransactionTable = (transactionData) => {
+  const newTd = `
+    <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
+      <td>${transactionData.id}</td>
+      <td>${transactionData.account}</td>
+      <td>${transactionData.type}</td>
+      <td>${transactionData.category}</td>
+      <td>${transactionData.description}</td>
+      <td>${transactionData.amount}</td>
+      <td>${transactionData.accountIdFrom}</td>
+      <td>${transactionData.accountIdTo}</td>
+    </tr>
+    `;
+  $("#transactionTable").append(newTd);
 };

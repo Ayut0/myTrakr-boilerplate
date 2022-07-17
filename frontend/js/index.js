@@ -11,6 +11,7 @@ import {
   generateTransaction,
   postNewTransaction,
   getTransactionData,
+  createTransactionTable,
 } from "./helpers/Transaction.js";
 
 $(() => {
@@ -31,14 +32,13 @@ $(() => {
       return false;
     }
     userList.push(newAccountName);
-    console.log(userList);
     const newAccount = {
       newAccountName,
       transactions: [],
     };
     postNewAccount(newAccount);
-    updateUserList();
   });
+  // updateUserList();
 
   //Show and hide select buttons based on transaction type
   const fromSelect = $("#fromButton");
@@ -89,22 +89,6 @@ $(() => {
   let targetAccountBalance;
 
   //Add new transaction table
-  const createTransactionTable = (transactionData) => {
-    const newTd = `
-    <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
-      <td>${transactionData.id}</td>
-      <td>${transactionData.account}</td>
-      <td>${transactionData.type}</td>
-      <td>${transactionData.category}</td>
-      <td>${transactionData.description}</td>
-      <td>${transactionData.amount}</td>
-      <td>${transactionData.accountIdFrom}</td>
-      <td>${transactionData.accountIdTo}</td>
-    </tr>
-    `;
-    $("#transactionTable").append(newTd);
-  };
-
   getTransactionData().done((data) => {
     data.forEach((item) => {
       item.forEach((element) => {
@@ -193,12 +177,10 @@ $(() => {
         );
         return targetAccount;
       });
-      console.log(currentBalanceData);
       //Filtered by name
       filteredAccount = currentBalanceData.filter(
         (account) => account.username === transactionUserName
       );
-
       targetAccountName = filteredAccount[0].username;
       targetAccountBalance = filteredAccount[0].balance;
     });
@@ -225,42 +207,17 @@ $(() => {
       amount: `${transactionAmount}`,
     };
 
-    $.ajax({
-      url: "http://localhost:3000/transaction",
-      type: "post",
-      contentType: "application/json",
-      dataType: "json",
-      data: JSON.stringify({
-        newTransaction: newTransactionData,
-      }),
-    })
+    postNewTransaction(newTransactionData)
       .done((data) => {
-        console.log(data);
         let generatedTransactionData;
         data.forEach((element) => {
-          console.log(element);
           generatedTransactionData = generateTransaction(element, element.type);
         });
         createTransactionTable(generatedTransactionData);
+        //Get user data to update their balance
+        $("#summary_list").empty();
         getUserData();
 
-        //Get user data to update their balance
-        // $.ajax({
-        //   url: "http://localhost:3000/accounts",
-        //   type: "get",
-        //   dataType: "json",
-        // }).done((data) => {
-        //   $("#summary_list").empty();
-        //   console.log(data);
-        //   const userData = data.map((item) => {
-        //     const instancedAccount = new Account(
-        //       item.username,
-        //       item.transactions
-        //     );
-        //     return instancedAccount;
-        //   });
-        //   console.log(userData);
-        // });
         $("#amount").val("");
         $("#description").val("");
       })
@@ -268,7 +225,7 @@ $(() => {
         alert(error);
       });
 
-    // alert("Your transaction went through!!");
+    alert("Your transaction went through!!");
   });
 
   //Filter transaction
