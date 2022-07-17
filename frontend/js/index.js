@@ -184,7 +184,7 @@ $(() => {
       targetAccountName = filteredAccount[0].username;
       targetAccountBalance = filteredAccount[0].balance;
     });
-
+    //Validation
     if (
       (transactionType === "Transfer" &&
         Math.abs(transactionAmount) > targetAccountBalance) ||
