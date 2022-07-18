@@ -157,7 +157,7 @@ $(() => {
     //Check the balance
     function getCurrentBalance() {
       return $.ajax({
-        url: "http://localhost:3000/accounts",
+        url: "https://simple-transaction-tracker.herokuapp.com/accounts",
         method: "get",
         contentType: "application/json",
         dataType: "json",

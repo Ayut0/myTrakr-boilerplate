@@ -4,7 +4,7 @@ const newCategoryButton = $("#categoryButton");
 
 export const postNewCategory = (categoryInputValue) => {
   $.ajax({
-    url: "http://localhost:3000/categories",
+    url: "https://simple-transaction-tracker.herokuapp.com/categories",
     method: "post",
     contentType: "application/json",
     dataType: "json",
@@ -26,7 +26,7 @@ export const postNewCategory = (categoryInputValue) => {
 
 export const getCategoryData = () => {
   $.ajax({
-    url: "http://localhost:3000/categories",
+    url: "https://simple-transaction-tracker.herokuapp.com/categories",
     type: "get",
     contentType: "application/json",
     dataType: "json",
