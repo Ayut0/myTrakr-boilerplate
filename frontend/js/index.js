@@ -36,7 +36,6 @@ $(() => {
     };
     postNewAccount(newAccount);
   });
-  // updateUserList();
 
   //Show and hide select buttons based on transaction type
   const fromSelect = $("#fromButton");
@@ -174,13 +173,25 @@ $(() => {
         return targetAccount;
       });
       //Filtered by name
-      filteredAccount = currentBalanceData.filter(
+      return (filteredAccount = currentBalanceData.filter(
         (account) => account.username === transactionUserName
-      );
-      targetAccountName = filteredAccount[0].username;
-      targetAccountBalance = filteredAccount[0].balance;
+      ));
+      // console.log(filteredAccount[0].balance);
+      // targetAccountName = filteredAccount[0].username;
+      // targetAccountBalance = filteredAccount[0].balance;
     });
+
     //Validation
+    console.log(filteredAccount[0].balance);
+    targetAccountName = filteredAccount[0].username;
+    targetAccountBalance = filteredAccount[0].balance;
+    console.log(
+      transactionType,
+      transactionAmount,
+      targetAccountName,
+      targetAccountBalance,
+      Math.abs(transactionAmount)
+    );
     if (
       (transactionType === "Transfer" &&
         Math.abs(transactionAmount) > targetAccountBalance) ||
