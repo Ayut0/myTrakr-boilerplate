@@ -116,7 +116,6 @@ export const getUserData = () => {
       );
       return targetAccount;
     });
-    console.log(currentBalanceData);
     currentBalanceData.forEach((user) => {
       createAccountSummary(user);
     });
