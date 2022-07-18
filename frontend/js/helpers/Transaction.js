@@ -31,17 +31,32 @@ class Withdrawal extends Transaction {
   }
 }
 
-class Deposit extends Transaction {
+export class Deposit extends Transaction {
   get value() {
     return this.amount;
   }
 }
 
 class Transfer extends Transaction {
-  constructor(accountIdFrom, accountIdTo) {
+  constructor(
+    amount,
+    account,
+    accountIdFrom,
+    accountIdTo,
+    type,
+    category,
+    description,
+    id
+  ) {
     super(accountIdFrom, accountIdTo);
+    this.amount = amount;
+    this.account = account;
     this.accountIdFrom = accountIdFrom;
     this.accountIdTo = accountIdTo;
+    this.type = type;
+    this.category = category;
+    this.description = description;
+    this.id = id;
   }
 }
 
@@ -50,10 +65,6 @@ let transactionUserName;
 let userAccountId;
 let userAccountIdFrom;
 let userAccountIdTo;
-// let filteredAccount;
-// let targetAccount;
-// let targetAccountName;
-// let targetAccountBalance;
 
 export const validatedTransaction = (typeOfTransaction) => {
   //Deposit and Withdraw
@@ -134,7 +145,7 @@ export const generateTransaction = (data, type) => {
 export const postNewTransaction = (transactionData) => {
   return $.ajax({
     url: "http://localhost:3000/transaction",
-    type: "post",
+    method: "post",
     contentType: "application/json",
     dataType: "json",
     data: JSON.stringify({
@@ -146,7 +157,7 @@ export const postNewTransaction = (transactionData) => {
 export const getTransactionData = () => {
   return $.ajax({
     url: "http://localhost:3000/transactions",
-    type: "get",
+    method: "get",
     contentType: "application/json",
     dataType: "json",
   });
@@ -165,5 +176,27 @@ export const createTransactionTable = (transactionData) => {
       <td>${transactionData.accountIdTo}</td>
     </tr>
     `;
+  // return newTd;
   $("#transactionTable").append(newTd);
+};
+
+export const updateTransactionTable = (user) => {
+  const td = $.map(user, (element) => {
+    return `
+      <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
+        <td>${element.id}</td>
+        <td>${element.account}</td>
+        <td>${element.type}</td>
+        <td>${element.category}</td>
+        <td>${element.description}</td>
+        <td>${element.amount}</td>
+        <td>${element.accountIdFrom}</td>
+        <td>${element.accountIdTo}</td>
+      </tr>
+    `;
+  });
+  $("#transactionTable").append(td);
+  // $.each(user, (index, Array) => {
+  //   console.log(Array);
+  // });
 };
