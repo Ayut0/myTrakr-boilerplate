@@ -67,10 +67,19 @@ export const postNewAccount = (account) => {
 };
 
 //Get user data
+export const getUser = () => {
+  return $.ajax({
+    url: "http://localhost:3000/accounts",
+    type: "get",
+    contentType: "application/json",
+    dataType: "json",
+  });
+};
+
 export const updateUserList = () => {
   $.ajax({
     url: "http://localhost:3000/accounts",
-    type: "get",
+    method: "get",
     dataType: "json",
   }).done((data) => {
     //Add a new user option tag
@@ -95,7 +104,7 @@ let targetAccount;
 export const getUserData = () => {
   return $.ajax({
     url: "http://localhost:3000/accounts",
-    type: "get",
+    method: "get",
     contentType: "application/json",
     dataType: "json",
   }).done((data) => {
@@ -107,7 +116,7 @@ export const getUserData = () => {
       );
       return targetAccount;
     });
-    // console.log(currentBalanceData);
+    console.log(currentBalanceData);
     currentBalanceData.forEach((user) => {
       createAccountSummary(user);
     });

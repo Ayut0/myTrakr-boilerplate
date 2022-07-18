@@ -1,17 +1,20 @@
 import {
   Account,
   postNewAccount,
+  getUser,
   updateUserList,
   getUserData,
 } from "./helpers/Account.js";
 import { postNewCategory } from "./helpers/Category.js";
 import {
   Transaction,
+  Deposit,
   validatedTransaction,
   generateTransaction,
   postNewTransaction,
   getTransactionData,
   createTransactionTable,
+  updateTransactionTable,
 } from "./helpers/Transaction.js";
 
 $(() => {
@@ -161,15 +164,13 @@ $(() => {
     function getCurrentBalance() {
       return $.ajax({
         url: "http://localhost:3000/accounts",
-        type: "get",
+        method: "get",
         contentType: "application/json",
         dataType: "json",
       });
     }
     getCurrentBalance().done((data) => {
-      console.log(data);
       let currentBalanceData = data.map((element) => {
-        console.log(element);
         targetAccount = new Account(
           element.newAccountName,
           element.transactions,
@@ -196,15 +197,14 @@ $(() => {
     }
 
     const newTransactionData = {
-      accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
+      amount: `${transactionAmount}`,
+      account: `${transactionUserName}`,
       accountIdFrom: `${userAccountIdFrom}`, // sender ID if type = 'Transfer', otherwise null
       accountIdTo: `${userAccountIdTo}`, // receiver ID if type = 'Transfer', otherwise null
-      // all info from form
-      account: `${transactionUserName}`,
       type: `${transactionType}`,
       category: `${transactionCategory}`,
       description: `${transactionDescription}`,
-      amount: `${transactionAmount}`,
+      accountId: `${userAccountId}`, // account ID for Deposits or Withdraws
     };
 
     postNewTransaction(newTransactionData)
@@ -213,11 +213,43 @@ $(() => {
         data.forEach((element) => {
           generatedTransactionData = generateTransaction(element, element.type);
         });
+        if (generatedTransactionData.type === "Transfer") {
+          getUser().done((data) => {
+            let userData = data.map((element) => {
+              targetAccount = new Account(
+                element.newAccountName,
+                element.transactions,
+                element.id
+              );
+              return targetAccount;
+            });
+            filteredAccount = userData.filter(
+              (account) =>
+                account.username === generatedTransactionData.accountIdTo
+            );
+            let receivedTransaction = newTransactionData;
+            receivedTransaction.amount = Math.abs(newTransactionData.amount);
+            receivedTransaction.account = filteredAccount[0].username;
+            receivedTransaction.id = filteredAccount[0].id;
+            receivedTransaction.accountId = filteredAccount[0].id;
+            $.ajax({
+              url: "http://localhost:3000/transaction",
+              method: "post",
+              contentType: "application/json",
+              dataType: "json",
+              data: JSON.stringify({
+                newTransaction: receivedTransaction,
+              }),
+            }).done((data) => {
+              //Get user data to update their balance
+              $("#summary_list").empty();
+              getUserData();
+            });
+          });
+        }
         createTransactionTable(generatedTransactionData);
-        //Get user data to update their balance
         $("#summary_list").empty();
         getUserData();
-
         $("#amount").val("");
         $("#description").val("");
       })
@@ -230,49 +262,46 @@ $(() => {
 
   //Filter transaction
   //Get user name from account
-  // $(filterSelectList).change((e) => {
-  //   console.log($("[name=filterSelect] option:selected").text());
-  //   const filteredName = $("[name=filterSelect] option:selected").text();
-  //   const filteredValue = $("[name=filterSelect] option:selected").val();
-  //   $.ajax({
-  //     url: "http://localhost:3000/accounts",
-  //     type: "get",
-  //     contentType: "application/json",
-  //     dataType: "json",
-  //   })
-  //     .done((data) => {
-  //       const allUser = data.map((item) => {
-  //         const account = new Account(item.username, item.transactions);
-  //         return account;
-  //       });
-  //       if (filteredName !== "All") {
-  //         const filteredAccountData = allUser[Number(filteredValue) - 1];
-  //         const filteredTd = $.map(
-  //           filteredAccountData.transactions,
-  //           (item) => {
-  //             return `
-  //             <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
-  //               <td>${item.id}</td>
-  //               <td>${item.userName}</td>
-  //               <td>${item.type}</td>
-  //               <td>${item.category}</td>
-  //               <td>${item.description}</td>
-  //               <td>${item.transactionAmount}</td>
-  //               <td>${item.accountIdFrom}</td>
-  //               <td>${item.accountIdTo}</td>
-  //             </tr>
-  //             `;
-  //           }
-  //         );
-  //         $(".transactionRow").empty();
-  //         $("#transactionTable").append(filteredTd);
-  //       } else {
-  //         $(".transactionRow").empty();
-  //         updateTransactionTable();
-  //       }
-  //     })
-  //     .fail((error) => {
-  //       alert(error);
-  //     });
-  // });
+  $("#filterSelect").change((e) => {
+    const filteredName = $("[name=filterSelect] option:selected").text();
+    const filteredValue = $("[name=filterSelect] option:selected").val();
+    getUser().done((data) => {
+      const allUser = data.map((item) => {
+        const account = new Account(
+          item.newAccountName,
+          item.transactions,
+          item.id
+        );
+        return account;
+      });
+      if (filteredName !== "All") {
+        const filteredAccountData = allUser[Number(filteredValue) - 1];
+        const filteredTd = $.map(filteredAccountData.transactions, (item) => {
+          return `
+                  <tr class="transactionRow focus:outline-none h-20 text-sm leading-none text-gray-800 dark:text-white  bg-white dark:bg-gray-800  hover:bg-gray-100 dark:hover:bg-gray-900  border-b border-t border-gray-100 dark:border-gray-700">
+                    <td>${item.id}</td>
+                    <td>${item.account}</td>
+                    <td>${item.type}</td>
+                    <td>${item.category}</td>
+                    <td>${item.description}</td>
+                    <td>${item.amount}</td>
+                    <td>${item.accountIdFrom}</td>
+                    <td>${item.accountIdTo}</td>
+                  </tr>
+                  `;
+        });
+        $(".transactionRow").hide();
+        $("#transactionTable").append(filteredTd);
+      } else {
+        $(".transactionRow").hide();
+        getTransactionData().done((data) => {
+          data.forEach((item) => {
+            item.forEach((element) => {
+              createTransactionTable(element);
+            });
+          });
+        });
+      }
+    });
+  });
 });
