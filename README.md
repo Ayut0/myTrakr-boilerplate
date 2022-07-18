@@ -60,7 +60,7 @@ frontend
 
 ## API Endpoints
 
-All the requests should have the domain of `http://localhost:3000/`.
+All the requests should have the domain of `https://simple-transaction-tracker.herokuapp.com/`.
 `http://localhost:3000/acounts`
 
 - GET `/accounts`: get all the accounts

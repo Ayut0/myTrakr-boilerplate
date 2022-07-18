@@ -38,7 +38,7 @@ export const createUserList = (newUserName, newUserId, selectTag) => {
 export const postNewAccount = (account) => {
   const newAccount = { ...account };
   $.ajax({
-    url: "http://localhost:3000/accounts",
+    url: "https://simple-transaction-tracker.herokuapp.com/accounts",
     method: "post",
     contentType: "application/json",
     dataType: "json",
@@ -69,7 +69,7 @@ export const postNewAccount = (account) => {
 //Get user data
 export const getUser = () => {
   return $.ajax({
-    url: "http://localhost:3000/accounts",
+    url: "https://simple-transaction-tracker.herokuapp.com/accounts",
     type: "get",
     contentType: "application/json",
     dataType: "json",
@@ -78,7 +78,7 @@ export const getUser = () => {
 
 export const updateUserList = () => {
   $.ajax({
-    url: "http://localhost:3000/accounts",
+    url: "https://simple-transaction-tracker.herokuapp.com/accounts",
     method: "get",
     dataType: "json",
   }).done((data) => {
@@ -103,7 +103,7 @@ let targetAccount;
 //Get current balance
 export const getUserData = () => {
   return $.ajax({
-    url: "http://localhost:3000/accounts",
+    url: "https://simple-transaction-tracker.herokuapp.com/accounts",
     method: "get",
     contentType: "application/json",
     dataType: "json",

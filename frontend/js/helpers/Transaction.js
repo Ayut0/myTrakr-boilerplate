@@ -144,7 +144,7 @@ export const generateTransaction = (data, type) => {
 
 export const postNewTransaction = (transactionData) => {
   return $.ajax({
-    url: "http://localhost:3000/transaction",
+    url: "https://simple-transaction-tracker.herokuapp.com/transaction",
     method: "post",
     contentType: "application/json",
     dataType: "json",
@@ -156,7 +156,7 @@ export const postNewTransaction = (transactionData) => {
 
 export const getTransactionData = () => {
   return $.ajax({
-    url: "http://localhost:3000/transactions",
+    url: "https://simple-transaction-tracker.herokuapp.com/transactions",
     method: "get",
     contentType: "application/json",
     dataType: "json",
