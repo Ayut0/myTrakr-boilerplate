@@ -2,19 +2,14 @@ import {
   Account,
   postNewAccount,
   getUser,
-  updateUserList,
   getUserData,
 } from "./helpers/Account.js";
 import { postNewCategory } from "./helpers/Category.js";
 import {
-  Transaction,
-  Deposit,
-  validatedTransaction,
   generateTransaction,
   postNewTransaction,
   getTransactionData,
   createTransactionTable,
-  updateTransactionTable,
 } from "./helpers/Transaction.js";
 
 $(() => {
@@ -232,15 +227,8 @@ $(() => {
             receivedTransaction.account = filteredAccount[0].username;
             receivedTransaction.id = filteredAccount[0].id;
             receivedTransaction.accountId = filteredAccount[0].id;
-            $.ajax({
-              url: "http://localhost:3000/transaction",
-              method: "post",
-              contentType: "application/json",
-              dataType: "json",
-              data: JSON.stringify({
-                newTransaction: receivedTransaction,
-              }),
-            }).done((data) => {
+
+            postNewTransaction(receivedTransaction).done((data) => {
               //Get user data to update their balance
               $("#summary_list").empty();
               getUserData();
