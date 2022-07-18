@@ -176,22 +176,9 @@ $(() => {
       return (filteredAccount = currentBalanceData.filter(
         (account) => account.username === transactionUserName
       ));
-      // console.log(filteredAccount[0].balance);
-      // targetAccountName = filteredAccount[0].username;
-      // targetAccountBalance = filteredAccount[0].balance;
     });
 
     //Validation
-    console.log(filteredAccount[0].balance);
-    targetAccountName = filteredAccount[0].username;
-    targetAccountBalance = filteredAccount[0].balance;
-    console.log(
-      transactionType,
-      transactionAmount,
-      targetAccountName,
-      targetAccountBalance,
-      Math.abs(transactionAmount)
-    );
     if (
       (transactionType === "Transfer" &&
         Math.abs(transactionAmount) > targetAccountBalance) ||
